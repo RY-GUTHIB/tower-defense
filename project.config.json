@@ -1,0 +1,13 @@
+{
+  "appid": "your-appid-here",
+  "projectname": "tower-defense",
+  "description": "抖音塔防小游戏",
+  "miniprogramRoot": "./",
+  "setting": {
+    "urlCheck": false,
+    "es6": true,
+    "enhance": true,
+    "postcss": true,
+    "minified": true
+  }
+}
