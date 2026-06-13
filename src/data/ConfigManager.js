@@ -9,6 +9,8 @@ import SPELLS from './spells.js';
 import { GACHA_CONFIG, RARITY_WEIGHTS, MAX_HAND_SIZE, calcGachaCost } from './gacha.js';
 import { StorageUtil } from '../utils/StorageUtil.js';
 
+const CONFIG_VERSION = "1.7.0"; // 与 game.json 版本同步
+
 const STORAGE_KEYS = {
   MONSTERS: '__cfg_monsters',
   TOWERS: '__cfg_towers',
@@ -33,7 +35,11 @@ class _ConfigManager {
   init() {
     if (this.initialized) return;
 
-    this.monsters = StorageUtil.get(STORAGE_KEYS.MONSTERS) || [...MONSTERS];
+    // 版本检查：如果代码版本与存储版本不一致，用新默认值覆盖
+    const storedVer = StorageUtil.get("__config_version");
+    const forceReset = storedVer !== CONFIG_VERSION;
+
+    this.monsters = forceReset ? [...MONSTERS] : (StorageUtil.get(STORAGE_KEYS.MONSTERS) || [...MONSTERS]);
     this.towers = StorageUtil.get(STORAGE_KEYS.TOWERS) || [...TOWERS];
     this.levels = StorageUtil.get(STORAGE_KEYS.LEVELS) || [...LEVELS];
     this.spells = StorageUtil.get(STORAGE_KEYS.SPELLS) || [...SPELLS];
@@ -55,6 +61,9 @@ class _ConfigManager {
         lv._goalImage = this._createImage(lv.goalImage);
       }
     }
+
+    // 保存当前配置版本
+    StorageUtil.set("__config_version", CONFIG_VERSION);
 
     this.initialized = true;
   }

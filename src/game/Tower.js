@@ -156,6 +156,7 @@ export class Tower {
     if (bestTarget) {
       this.cooldownTimer = this.cd;
       this.target = bestTarget;
+      this.triggerAttackFlash(); // 攻击命中时直接触发闪光
 
       // 减速效果
       if (this.isSlow) {

@@ -2,6 +2,8 @@
  * CombatSystem.js - 战斗系统
  * 每帧协调：塔攻击 → 怪物受伤 → 怪物移动 → 到达终点扣血 → 清理死亡
  */
+import { AudioManager } from "../audio/AudioManager.js";
+
 export class CombatSystem {
   constructor() {
     this.effects = [];  // 视觉特效队列 [{type, x, y, ...}]
@@ -32,6 +34,9 @@ export class CombatSystem {
           fromX: pt.tower.x, fromY: pt.tower.y,
           toX: result.target.x, toY: result.target.y
         });
+        // 根据塔类型播放攻击音效
+        const sfxType = pt.towerDef.sfxType || "arrow";
+        AudioManager.playAttack(sfxType);
 
         // 击杀检查
         if (!result.target.alive) {
@@ -42,6 +47,7 @@ export class CombatSystem {
             y: result.target.y,
             reward: result.target.reward
           });
+          AudioManager.playKill();
         }
       }
     }
@@ -92,6 +98,8 @@ export class CombatSystem {
     }
 
     // 检查是否有已放置塔占用这些格子
+    // 注意：完全重叠（同位置同尺寸同类型同等级）允许合并升级，
+    // 此时格子类型仍为 0（空地），所以不会被上面的格子类型检查拦截。
     for (const pt of placedTowers) {
       const ptGC = pt.towerDef.gridCols || 1;
       const ptGR = pt.towerDef.gridRows || 1;

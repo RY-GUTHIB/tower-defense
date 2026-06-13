@@ -58,6 +58,7 @@ export class GameEngine {
     this.hoverRow = -1;
     this.selectedPlacedTowerIdx = -1;
     this.selectedHandIndex = -1;  // 由GamePage设置
+    this._snapshot = {};  // 复用对象，减少 GC
   }
 
   start() {
@@ -142,13 +143,7 @@ export class GameEngine {
     for (const pt of gs.placedTowers) {
       pt.tower.updateAnim(dt);
     }
-    // 塔攻击时触发闪光（冷却刚开始，固定0.1秒窗口，不依赖帧间隔）
-    const FLASH_WINDOW = 0.1;
-    for (const pt of gs.placedTowers) {
-      if (pt.tower.cooldownTimer > 0 && pt.tower.cooldownTimer > pt.tower.cd - FLASH_WINDOW && pt.tower.cooldownTimer <= pt.tower.cd) {
-        pt.tower.triggerAttackFlash();
-      }
-    }
+    // 攻击闪光已由 Tower.tryAttack() 命中时直接触发，无需额外检测
 
     // 清除死亡/到达怪物
     this.monsters = this.monsters.filter(m => m.alive);
@@ -637,7 +632,7 @@ export class GameEngine {
   }
 
   /** 检查是否可以合并升级（拖拽松手后判定） */
-  canMovePlacedTower(towerIdx, newCol, newRow) {
+  canMergeTower(towerIdx, newCol, newRow) {
     const gs = this.gameState;
     if (towerIdx < 0 || towerIdx >= gs.placedTowers.length) return false;
     const pt = gs.placedTowers[towerIdx];
@@ -668,9 +663,9 @@ export class GameEngine {
   }
 
   /** 合并升级：拖拽塔到同ID同等级塔上，目标塔等级+1，拖拽塔删除 */
-  movePlacedTower(towerIdx, newCol, newRow) {
+  mergeTower(towerIdx, newCol, newRow) {
     const gs = this.gameState;
-    if (!this.canMovePlacedTower(towerIdx, newCol, newRow)) return false;
+    if (!this.canMergeTower(towerIdx, newCol, newRow)) return false;
 
     const pt = gs.placedTowers[towerIdx];
     const towerDef = pt.towerDef;
@@ -705,20 +700,20 @@ export class GameEngine {
   /** 获取当前状态快照 */
   getSnapshot() {
     const gs = this.gameState;
-    return {
-      state: gs.state,
-      hp: gs.hp,
-      maxHp: gs.maxHp,
-      gold: gs.gold,
-      currentWave: this.waveManager.currentWaveIndex,
-      totalWaves: this.waveManager.totalWaves,
-      hand: gs.hand,
-      handDisabled: gs.handDisabled,
-      placedTowers: gs.placedTowers,
-      selectedPlacedTowerIdx: this.selectedPlacedTowerIdx,
-      drawCount: gs.drawCount,
-      pityCounter: gs.pityCounter,
-      drawCost: this.gacha.getCurrentCost()
-    };
+    const s = this._snapshot;
+    s.state = gs.state;
+    s.hp = gs.hp;
+    s.maxHp = gs.maxHp;
+    s.gold = gs.gold;
+    s.currentWave = this.waveManager.currentWaveIndex;
+    s.totalWaves = this.waveManager.totalWaves;
+    s.hand = gs.hand;
+    s.handDisabled = gs.handDisabled;
+    s.placedTowers = gs.placedTowers;
+    s.selectedPlacedTowerIdx = this.selectedPlacedTowerIdx;
+    s.drawCount = gs.drawCount;
+    s.pityCounter = gs.pityCounter;
+    s.drawCost = this.gacha.getCurrentCost();
+    return s;
   }
 }

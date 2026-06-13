@@ -160,6 +160,14 @@ export class GamePage {
       this.handButtons.push({ x: cx, y: handY, w: cardW, h: cardH, index: i, hasCard, isDisabled });
     }
 
+    // 手牌禁用提示
+    if (s.handDisabled && s.handDisabled.some(d => d)) {
+      ctx.fillStyle = Color.textMuted;
+      ctx.font = Font.caption;
+      ctx.textAlign = "left";
+      ctx.fillText("放置后需刷新手牌才能继续操作", 8, handY + cardH + 14);
+    }
+
     // 刷新按钮
     const drawBtn = { x: w - 72, y: handY + 8, w: 64, h: 44 };
     ctx.fillStyle = Color.purple;
@@ -227,7 +235,7 @@ export class GamePage {
 
       const grid = pixelToGrid(this.dragCurrentX, this.dragCurrentY);
       if (grid.col >= 0 && grid.col < GRID_COLS && grid.row >= 0 && grid.row < GRID_ROWS) {
-        const canPlace = this.engine.canMovePlacedTower(this.dragTowerIdx, grid.col, grid.row);
+        const canPlace = this.engine.canMergeTower(this.dragTowerIdx, grid.col, grid.row);
         for (let dr = 0; dr < gr; dr++) {
           for (let dc = 0; dc < gc; dc++) {
             const tx = MAP_OFFSET_X + (grid.col + dc) * TILE_SIZE;
@@ -379,7 +387,7 @@ export class GamePage {
     if (this.dragging && this.dragTowerIdx >= 0) {
       const grid = pixelToGrid(x, y);
       if (grid.col >= 0 && grid.col < GRID_COLS && grid.row >= 0 && grid.row < GRID_ROWS) {
-        const success = this.engine.movePlacedTower(this.dragTowerIdx, grid.col, grid.row);
+        const success = this.engine.mergeTower(this.dragTowerIdx, grid.col, grid.row);
         if (success) {
           this._showToast('升级成功');
         } else {
@@ -510,16 +518,14 @@ export class GamePage {
   }
 
   _showToast(msg) {
-    const ctx = this.ctx;
-    ctx.fillStyle = Color.overlay;
-    const tw = ctx.measureText(msg).width + 20;
-    ctx.fillRect(this.w / 2 - tw / 2, this.h / 2 + 60, tw, 30);
-    ctx.fillStyle = Color.textPrimary;
-    ctx.font = Font.body;
-    ctx.textAlign = 'center';
-    ctx.fillText(msg, this.w / 2, this.h / 2 + 82);
-    this.toastTimer && clearTimeout(this.toastTimer);
-    this.toastTimer = setTimeout(() => { /* toast自然消失 */ }, 1500);
+    // 使用 DOM toast（由 UIManager 提供），避免 Canvas 绘制后被下一帧覆盖
+    const toast = document.getElementById("toast");
+    if (toast) {
+      toast.textContent = msg;
+      toast.classList.add("show");
+      if (this._toastTimer) clearTimeout(this._toastTimer);
+      this._toastTimer = setTimeout(() => toast.classList.remove("show"), 1500);
+    }
   }
 
   _hit(rect, x, y) {

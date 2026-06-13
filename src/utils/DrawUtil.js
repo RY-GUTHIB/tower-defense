@@ -143,9 +143,11 @@ export function gridToPixel(col, row) {
 }
 
 export function pixelToGrid(px, py) {
+  const col = Math.floor((px - MAP_OFFSET_X) / TILE_SIZE);
+  const row = Math.floor((py - MAP_OFFSET_Y) / TILE_SIZE);
   return {
-    col: Math.floor((px - MAP_OFFSET_X) / TILE_SIZE),
-    row: Math.floor((py - MAP_OFFSET_Y) / TILE_SIZE)
+    col: Math.max(-1, Math.min(col, GRID_COLS)),
+    row: Math.max(-1, Math.min(row, GRID_ROWS))
   };
 }
 

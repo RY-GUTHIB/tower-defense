@@ -16,7 +16,7 @@ const _get = (key) => {
       if (!v) return null;
       return JSON.parse(v);
     }
-  } catch (e) { return null; }
+  } catch (e) { if (typeof location !== "undefined" && location.hostname === "localhost") console.warn("[StorageUtil] get error:", e); return null; }
 };
 
 const _set = (key, value) => {

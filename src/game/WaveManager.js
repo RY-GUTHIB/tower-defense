@@ -4,7 +4,7 @@
  */
 export class WaveManager {
   constructor(levelData) {
-    this.waves = levelData.waves;
+    this.waves = JSON.parse(JSON.stringify(levelData.waves)); // 深拷贝，避免运行时状态污染原始配置
     this.totalWaves = this.waves.length;
     this.currentWaveIndex = 0;
     this.spawnQueue = [];        // 待生成的怪物队列 [{id, col, row}]

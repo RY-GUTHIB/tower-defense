@@ -111,11 +111,18 @@ class _AudioManager {
     sg.gain.linearRampToValueAtTime(0.01, now + 7); sg.gain.linearRampToValueAtTime(0, now + 8);
     s.connect(sg); sg.connect(this.bgmGain); s.start(now); s.stop(now + 8);
     this._bgmOscs.push(s, sg);
-    // Loop
-    setTimeout(() => {
-      this._bgmOscs = this._bgmOscs.filter(o => { try { o.stop(); } catch(e){} return false; });
-      this._bgmLoop();
-    }, 8000);
+    // Loop — 用 AudioContext.currentTime 精确调度，避免后台标签页节流
+    const loopDelay = 8000;
+    const checkLoop = () => {
+      if (!this.bgmPlaying) return;
+      if (ctx.currentTime >= now + loopDelay / 1000 - 0.1) {
+        this._bgmOscs = this._bgmOscs.filter(o => { try { o.stop(); } catch(e){} return false; });
+        this._bgmLoop();
+      } else {
+        setTimeout(checkLoop, 200);
+      }
+    };
+    setTimeout(checkLoop, loopDelay - 500);
   }
 
   // SFX — attack sounds

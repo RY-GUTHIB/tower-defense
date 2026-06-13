@@ -104,10 +104,14 @@ export class Monster {
     }
 
     const effectiveSpeed = this.speed * this.slowMultiplier;
-    const step = effectiveSpeed * dt;
+    let step = effectiveSpeed * dt;
+
+    // 限制单帧最大移动距离，防止切后台回来后怪物瞬移
+    const maxStepPerFrame = 2.0; // 最多跨 2 个路径段
+    step = Math.min(step, maxStepPerFrame);
     this.progress += step;
 
-    // 到达当前路径点 → 前进到下一个
+    // 到达当前路径点 → 前进到下一个（逐点更新位置，避免视觉跳过）
     while (this.progress >= 1.0 && this.pathIndex < this.path.length - 1) {
       this.progress -= 1.0;
       this.pathIndex++;
