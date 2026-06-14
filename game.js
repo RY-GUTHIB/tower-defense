@@ -15,14 +15,14 @@ const { windowWidth: W, windowHeight: H } = tt.getSystemInfoSync();
 canvas.width = W;
 canvas.height = H;
 
-// 初始化全局配置
-ConfigManager.init();
+// 初始化全局配置（异步：尝试拉取远程配置，5秒超时后降级）
+ConfigManager.init().then(() => {
+  // 初始化场景管理器并进入首页
+  const sceneManager = new SceneManager(canvas, ctx, W, H);
+  sceneManager.goto('home');
 
-// 初始化场景管理器并进入首页
-const sceneManager = new SceneManager(canvas, ctx, W, H);
-sceneManager.goto('home');
-
-// 触摸事件转发
-tt.onTouchStart(e => sceneManager.onTouchStart(e));
-tt.onTouchMove(e => sceneManager.onTouchMove(e));
-tt.onTouchEnd(e => sceneManager.onTouchEnd(e));
+  // 触摸事件转发
+  tt.onTouchStart(e => sceneManager.onTouchStart(e));
+  tt.onTouchMove(e => sceneManager.onTouchMove(e));
+  tt.onTouchEnd(e => sceneManager.onTouchEnd(e));
+});

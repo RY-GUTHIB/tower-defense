@@ -713,7 +713,7 @@ export class GameEngine {
     s.selectedPlacedTowerIdx = this.selectedPlacedTowerIdx;
     s.drawCount = gs.drawCount;
     s.pityCounter = gs.pityCounter;
-    s.drawCost = this.gacha.getCurrentCost();
+    s.drawCost = this.gacha.getCurrentCost(gs);
     return s;
   }
 }

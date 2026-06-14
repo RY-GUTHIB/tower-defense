@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>后台配置 - 塔防风云</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#1a1a2e;overflow:hidden;display:flex;justify-content:center;align-items:center;height:100vh;touch-action:none;user-select:none;-webkit-user-select:none;}
+canvas{display:block;}
+#toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.85);color:#fff;padding:10px 20px;border-radius:8px;font:14px sans-serif;pointer-events:none;opacity:0;transition:opacity 0.3s;z-index:100;}
+#toast.show{opacity:1;}
+#modalOverlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:none;justify-content:center;align-items:center;z-index:200;}
+#modalOverlay.active{display:flex;}
+#modalBox{background:#2E2E3E;border-radius:12px;padding:24px;width:280px;text-align:center;color:#fff;font:14px sans-serif;}
+#modalBox h3{margin-bottom:12px;color:#FF9800;font-size:18px;}
+#modalBox input{width:100%;padding:8px 12px;border:1px solid #555;border-radius:6px;background:#1a1a2e;color:#fff;font-size:16px;text-align:center;outline:none;margin-bottom:12px;}
+#modalBox input:focus{border-color:#FF9800;}
+#modalBox button{padding:8px 24px;border:none;border-radius:6px;font-size:14px;cursor:pointer;margin:4px;}
+#modalBox .btn-confirm{background:#4CAF50;color:#fff;}
+#modalBox .btn-cancel{background:#666;color:#fff;}
+</style>
+</head>
+<body>
+<canvas id="adminCanvas"></canvas>
+<div id="toast"></div>
+<div id="modalOverlay"><div id="modalBox"><h3 id="modalTitle"></h3><input id="modalInput" type="text" placeholder=""><div><button class="btn-confirm" id="modalConfirm">确认</button><button class="btn-cancel" id="modalCancel">取消</button></div></div></div>
+<script type="module" src="admin-entry.js"></script>
+</body>
+</html>

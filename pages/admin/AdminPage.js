@@ -31,9 +31,12 @@ export class AdminPage {
     this.h = h;
     this.onBack = onBack;
 
-    this.tab = 'audio'; // 'audio' | 'levels' | 'monsters' | 'towers' | 'gacha'
+    this.tab = 'audio'; // 'audio' | 'levels' | 'monsters' | 'towers' | 'gacha' | 'sync'
     this.scrollOffset = 0;
     this.editTarget = null;
+    this.syncStatus = '';
+    this._uploadFolder = 'towers';
+    this.uploadResult = '';
 
     // 地图编辑器状态
     this.editMap = false;
@@ -51,6 +54,7 @@ export class AdminPage {
     // 开发者授权检查
     if (!this._isAuthorized()) {
       this._pendingAuth = true;
+      this.render();
       return;
     }
     this.render();
@@ -92,7 +96,8 @@ export class AdminPage {
       { label: '怪物', key: 'monsters' },
       { label: '塔', key: 'towers' },
       { label: '🃏 抽卡', key: 'gacha' },
-      { label: '⚡ 技能', key: 'spells' }
+      { label: '⚡ 技能', key: 'spells' },
+      { label: '☁️ 同步', key: 'sync' }
     ];
     const activeIdx = tabs.findIndex(t => t.key === this.tab);
     const tabW = 54, tabY = 50;
@@ -118,6 +123,7 @@ export class AdminPage {
     else if (this.tab === 'audio') this._renderAudioTab(ctx, contentY);
     else if (this.tab === 'gacha') this._renderGachaTab(ctx, contentY);
     else if (this.tab === 'spells') this._renderSpellList(ctx, contentY);
+    else if (this.tab === 'sync') this._renderSyncTab(ctx, contentY);
   }
 
   // ========== 图片预览弹窗 ==========
@@ -615,15 +621,18 @@ export class AdminPage {
     }
 
     // 开始页背景
-    const hasBg = !!StorageUtil.get('__home_bg_dataUrl');
+    const hasBg = !!(ConfigManager.homeBgUrl || StorageUtil.get('__home_bg_dataUrl'));
+    const bgLabel = ConfigManager.homeBgUrl
+      ? '开始页背景: ' + ConfigManager.homeBgUrl.split('/').pop()
+      : (hasBg ? '开始页背景: 已设置（旧）' : '开始页背景: 未设置');
     drawCard(ctx, 12, y, this.w - 24, 44);
     ctx.fillStyle = Color.textPrimary;
     ctx.font = Font.body;
     ctx.textAlign = 'left';
-    ctx.fillText(hasBg ? '开始页背景: 已设置' : '开始页背景: 未设置', 24, y + 28);
+    ctx.fillText(bgLabel, 24, y + 28);
 
     drawButton(ctx, this.w - 76, y + 8, 56, 28,
-      hasBg ? '✓ 背景图' : '上传背景',
+      hasBg ? '✓ 更换' : '上传背景',
       { color: hasBg ? Color.accent : Color.purple, fontSize: 10, fontWeight: '600' });
     this.homeBgBtn = { x: this.w - 76, y: y + 8, w: 56, h: 28 };
 
@@ -646,6 +655,49 @@ export class AdminPage {
   /**
    * 上传终点贴图
    */
+  /**
+   * 上传图片到服务器 assets/ 文件夹
+   * @param {File} file - 浏览器 File 对象
+   * @param {string} folder - 目标子目录 ('monsters'|'towers'|'levels'|'general')
+   * @returns {Promise<string>} 服务器图片路径，如 '/assets/monsters/abc123.png'
+   */
+  _uploadToServer(file, folder) {
+    return new Promise((resolve, reject) => {
+      const formData = new FormData();
+      formData.append('password', 'admin888');
+      formData.append('image', file);
+      formData.append('folder', folder);
+      fetch('/api/upload', { method: 'POST', body: formData })
+        .then(r => {
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          return r.json();
+        })
+        .then(data => {
+          if (data.ok) resolve(data.url);
+          else reject(new Error(data.error || '上传失败'));
+        })
+        .catch(e => reject(e));
+    });
+  }
+
+  /**
+   * 自动将当前配置同步到服务器 config.json
+   */
+  _autoSyncConfig() {
+    const config = ConfigManager.exportConfig();
+    fetch('/api/config', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: 'admin888', config })
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.ok) showToast('配置已同步', 1500);
+      else showToast('同步失败: ' + (data.error || '未知错误'), 2500);
+    })
+    .catch(e => showToast('同步失败: ' + e.message, 2500));
+  }
+
   _uploadGoalImage(levelData, levelIdx) {
     // 抖音小游戏环境
     if (typeof tt !== 'undefined' && tt.chooseImage) {
@@ -669,27 +721,29 @@ export class AdminPage {
       return;
     }
 
-    // 浏览器环境：使用隐藏input
+    // 浏览器环境：上传到服务器
+    showToast('上传中...', 60000);
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
     input.onchange = (e) => {
       const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        const dataUrl = ev.target.result;
+      if (!file) { showToast('', 0); return; }
+      this._uploadToServer(file, 'levels').then(url => {
         const img = new Image();
         img.onload = () => {
-          levelData.goalImage = dataUrl;
+          levelData.goalImage = url;
           levelData._goalImage = img;
           ConfigManager.saveLevels(ConfigManager.getLevels());
+          showToast('终点图上传成功', 1500);
+          this._autoSyncConfig();
           this.render();
         };
         img.onerror = () => { showToast('关卡目标图加载失败', 1500); };
-        img.src = dataUrl;
-      };
-      reader.readAsDataURL(file);
+        img.src = url;
+      }).catch(e => {
+        showToast('上传失败: ' + e.message, 2000);
+      });
     };
     input.click();
   }
@@ -716,24 +770,24 @@ export class AdminPage {
       });
       return;
     }
+    showToast('上传中...', 60000);
     const input = document.createElement('input');
     input.type = 'file'; input.accept = 'image/*';
     input.onchange = (e) => {
-      const file = e.target.files[0]; if (!file) return;
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        const dataUrl = ev.target.result;
+      const file = e.target.files[0]; if (!file) { showToast('', 0); return; }
+      this._uploadToServer(file, 'levels').then(url => {
         const img = new Image();
         img.onload = () => {
-          levelData.bgImage = dataUrl;
+          levelData.bgImage = url;
           levelData._bgImage = img;
           ConfigManager.saveLevels(ConfigManager.getLevels());
+          showToast('背景图上传成功', 1500);
+          this._autoSyncConfig();
           this.render();
         };
         img.onerror = () => { showToast('关卡背景图加载失败', 1500); };
-        img.src = dataUrl;
-      };
-      reader.readAsDataURL(file);
+        img.src = url;
+      }).catch(e => { showToast('上传失败: ' + e.message, 2000); });
     };
     input.click();
   }
@@ -760,24 +814,24 @@ export class AdminPage {
       });
       return;
     }
+    showToast('上传中...', 60000);
     const input = document.createElement('input');
     input.type = 'file'; input.accept = 'image/*';
     input.onchange = (e) => {
-      const file = e.target.files[0]; if (!file) return;
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        const dataUrl = ev.target.result;
+      const file = e.target.files[0]; if (!file) { showToast('', 0); return; }
+      this._uploadToServer(file, 'levels').then(url => {
         const img = new Image();
         img.onload = () => {
-          levelData.pathImage = dataUrl;
+          levelData.pathImage = url;
           levelData._pathImage = img;
           ConfigManager.saveLevels(ConfigManager.getLevels());
+          showToast('路径图上传成功', 1500);
+          this._autoSyncConfig();
           this.render();
         };
         img.onerror = () => { showToast('关卡路径图加载失败', 1500); };
-        img.src = dataUrl;
-      };
-      reader.readAsDataURL(file);
+        img.src = url;
+      }).catch(e => { showToast('上传失败: ' + e.message, 2000); });
     };
     input.click();
   }
@@ -889,6 +943,8 @@ export class AdminPage {
         }
         if (type === 'tower') ConfigManager.saveTowers(ConfigManager.getTowers());
         else ConfigManager.saveMonsters(ConfigManager.getMonsters());
+        showToast('动画图已保存', 1500);
+        this._autoSyncConfig();
         this.render();
       });
     };
@@ -913,26 +969,26 @@ export class AdminPage {
       return;
     }
 
-    // 浏览器环境：input.click() 必须在用户手势的同步调用栈中执行
+    showToast('上传中...', 60000);
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
     input.onchange = (e) => {
       const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        const dataUrl = ev.target.result;
+      if (!file) { showToast('', 0); return; }
+      const folder = type === 'tower' ? 'towers' : 'monsters';
+      this._uploadToServer(file, folder).then(url => {
         const img = new Image();
         img.onload = () => {
-          finishWithConfig({ url: dataUrl, img: img });
+          finishWithConfig({ url: url, img: img });
         };
         img.onerror = () => {
           showToast('图片加载失败，请检查文件格式', 1500);
         };
-        img.src = dataUrl;
-      };
-      reader.readAsDataURL(file);
+        img.src = url;
+      }).catch(e => {
+        showToast('上传失败: ' + e.message, 2000);
+      });
     };
     input.click();
   }
@@ -972,26 +1028,32 @@ export class AdminPage {
         sizeType: ['compressed'],
         success: (res) => {
           const path = res.tempFilePaths[0];
-          StorageUtil.set('__home_bg_dataUrl', path);
+          ConfigManager.saveHomeBgUrl(path);
+          StorageUtil.set('__home_bg_dataUrl', path); // 兼容旧逻辑
+          this._autoSyncConfig();
           this.render();
         }
       });
       return;
     }
 
-    // 浏览器环境
+    // 浏览器环境：上传到服务器
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
     input.onchange = (e) => {
+      showToast('上传中...', 60000);
       const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        StorageUtil.set('__home_bg_dataUrl', ev.target.result);
+      if (!file) { showToast('', 0); return; }
+      this._uploadToServer(file, 'general').then(url => {
+        ConfigManager.saveHomeBgUrl(url);
+        StorageUtil.set('__home_bg_dataUrl', url); // 兼容旧逻辑
+        showToast('主页背景图已上传', 1500);
+        this._autoSyncConfig();
         this.render();
-      };
-      reader.readAsDataURL(file);
+      }).catch(e => {
+        showToast('上传失败: ' + e.message, 2000);
+      });
     };
     input.click();
   }
@@ -1283,6 +1345,27 @@ export class AdminPage {
         if (this._hit(btn, x, y)) { this._editSpellField(btn.spellIdx, btn.field, btn.value); return; }
       }
     }
+
+    // 同步 Tab —— 本地服务器
+    if (this.tab === 'sync') {
+      // 分类选择
+      if (this._uploadFolderBtns) {
+        for (const btn of this._uploadFolderBtns) {
+          if (this._hit(btn, x, y)) {
+            this._uploadFolder = btn.folder;
+            this.render(); return;
+          }
+        }
+      }
+      // 保存配置
+      if (this._syncBtn && this._hit(this._syncBtn, x, y)) {
+        this._syncToLocalServer(); return;
+      }
+      // 上传图片
+      if (this._uploadBtn && this._hit(this._uploadBtn, x, y)) {
+        this._triggerImageUpload(); return;
+      }
+    }
   }
 
   _handleMapEditorTouch(x, y) {
@@ -1387,6 +1470,151 @@ export class AdminPage {
     return [{ col: spawn.col, row: spawn.row }, { col: goal.col, row: goal.row }];
   }
 
+  // ========== ☁️ 同步 Tab（本地服务器） ==========
+  _renderSyncTab(ctx, y) {
+    const w = this.w;
+    let cy = y + 10;
+
+    ctx.fillStyle = Color.textPrimary;
+    ctx.font = Font.subtitle;
+    ctx.textAlign = 'left';
+    ctx.fillText('☁️ 配置同步', 12, cy + 24); cy += 36;
+
+    ctx.fillStyle = Color.textSecondary;
+    ctx.font = '11px ' + Font.family;
+    ctx.fillText('将当前配置保存到本地 config.json，所有玩家下次进入游戏自动生效。', 12, cy + 16); cy += 28;
+    ctx.fillText('服务器地址：localhost:3000 | 同步密码：admin888', 12, cy + 16); cy += 28;
+
+    // 同步按钮
+    cy += 10;
+    drawButton(ctx, 12, cy, w - 24, 40, '📤 保存配置到 config.json', {
+      color: Color.accent,
+      fontSize: 14,
+      fontWeight: '600'
+    });
+    this._syncBtn = { x: 12, y: cy, w: w - 24, h: 40 };
+    cy += 50;
+
+    // 状态提示
+    if (this.syncStatus) {
+      ctx.fillStyle = this.syncStatus.includes('成功') ? Color.accent : Color.warning;
+      ctx.font = '12px ' + Font.family;
+      ctx.textAlign = 'center';
+      ctx.fillText(this.syncStatus, w / 2, cy); cy += 24;
+    }
+
+    // ==== 图片上传区 ====
+    cy += 12;
+    ctx.fillStyle = Color.textPrimary;
+    ctx.font = Font.subtitle;
+    ctx.textAlign = 'left';
+    ctx.fillText('🖼️ 图片上传', 12, cy + 24); cy += 36;
+
+    ctx.fillStyle = Color.textSecondary;
+    ctx.font = '11px ' + Font.family;
+    ctx.fillText('支持 PNG/JPG/SVG/WebP/GIF，上传后保存到 public/assets/ 目录。', 12, cy + 16); cy += 28;
+
+    // 分类选择
+    const folders = ['towers', 'monsters', 'spells', 'general'];
+    const folderLabels = ['塔', '怪物', '技能', '通用'];
+    const btnW = (w - 24 - 12) / 4;
+    this._uploadFolderBtns = [];
+    for (let i = 0; i < folders.length; i++) {
+      const bx = 12 + i * (btnW + 4);
+      const sel = this._uploadFolder === folders[i];
+      drawButton(ctx, bx, cy, btnW, 28, folderLabels[i], {
+        color: sel ? Color.accent : Color.card,
+        fontSize: 11,
+        fontWeight: sel ? '600' : '400'
+      });
+      this._uploadFolderBtns.push({ x: bx, y: cy, w: btnW, h: 28, folder: folders[i] });
+    }
+    cy += 38;
+
+    // 上传按钮
+    drawButton(ctx, 12, cy, w - 24, 36, '📎 选择图片上传', {
+      color: Color.card,
+      fontSize: 13,
+      fontWeight: '500'
+    });
+    this._uploadBtn = { x: 12, y: cy, w: w - 24, h: 36 };
+    cy += 44;
+
+    // 上传结果
+    if (this.uploadResult) {
+      ctx.fillStyle = Color.accent;
+      ctx.font = '11px ' + Font.family;
+      ctx.textAlign = 'center';
+      ctx.fillText('✅ ' + this.uploadResult, w / 2, cy);
+    }
+
+    cy += 30;
+    ctx.fillStyle = Color.textSecondary;
+    ctx.font = '10px ' + Font.family;
+    ctx.textAlign = 'left';
+    ctx.fillText('服务器端运行 node server.js | 部署时 config.json + public/assets 打包上传', 12, cy);
+  }
+
+  async _syncToLocalServer() {
+    this.syncStatus = '正在保存...';
+    this.render();
+
+    try {
+      const config = ConfigManager.exportConfig();
+      const resp = await fetch('/api/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: 'admin888', config })
+      });
+      const data = await resp.json();
+      if (data.ok) {
+        this.syncStatus = '✅ 保存成功！config.json 已更新';
+        showToast('配置已保存到服务器', 1500);
+      } else {
+        throw new Error(data.error || '未知错误');
+      }
+    } catch (e) {
+      this.syncStatus = '❌ 保存失败: ' + e.message + '（请确认 server.js 已启动）';
+      showToast('同步失败，检查服务器', 2000);
+    }
+    this.render();
+  }
+
+  _triggerImageUpload() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/png,image/jpeg,image/svg+xml,image/webp,image/gif';
+    input.onchange = async () => {
+      const file = input.files[0];
+      if (!file) return;
+
+      const form = new FormData();
+      form.append('password', 'admin888');
+      form.append('image', file);
+      form.append('folder', this._uploadFolder || 'general');
+
+      this.syncStatus = '正在上传图片...';
+      this.render();
+
+      try {
+        const resp = await fetch('/api/upload', { method: 'POST', body: form });
+        const data = await resp.json();
+        if (data.ok) {
+          this.uploadResult = data.url + ' (' + (data.size / 1024).toFixed(1) + 'KB)';
+          showToast('图片上传成功', 1200);
+        } else {
+          throw new Error(data.error);
+        }
+      } catch (e) {
+        this.uploadResult = '';
+        this.syncStatus = '❌ 上传失败: ' + e.message;
+        showToast('上传失败', 1500);
+      }
+      this.render();
+    };
+    input.click();
+  }
+
   // ========== 开发者授权 ==========
   _isAuthorized() {
     return StorageUtil.get('__dev_authorized') === true;
@@ -1474,9 +1702,10 @@ export class AdminPage {
         const CM = ConfigManager.constructor.prototype ? Object.getPrototypeOf(ConfigManager) : ConfigManager;
         // 直接设置 initialized = false 让下次 init 生效
         ConfigManager.initialized = false;
-        ConfigManager.init();
-        showToast('已恢复默认', 800);
-        this.render();
+        ConfigManager.init().then(() => {
+          showToast('已恢复默认', 800);
+          this.render();
+        });
       }
     });
   }

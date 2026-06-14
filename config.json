@@ -1,0 +1,1489 @@
+{
+  "version": "1.7.0",
+  "monsters": [
+    {
+      "id": "normal_1",
+      "name": "小兵",
+      "type": "normal",
+      "hp": 5,
+      "speed": 2,
+      "damage": 1,
+      "reward": 5,
+      "color": "#4CAF50",
+      "image": null,
+      "animDataUrl": null
+    },
+    {
+      "id": "normal_2",
+      "name": "快速小兵",
+      "type": "normal",
+      "hp": 3,
+      "speed": 3.5,
+      "damage": 1,
+      "reward": 6,
+      "color": "#8BC34A",
+      "image": null,
+      "animDataUrl": null
+    },
+    {
+      "id": "elite_1",
+      "name": "精英战士",
+      "type": "elite",
+      "hp": 20,
+      "speed": 1.5,
+      "damage": 3,
+      "reward": 20,
+      "color": "#FF9800",
+      "image": null,
+      "animDataUrl": null
+    },
+    {
+      "id": "elite_2",
+      "name": "精英法师",
+      "type": "elite",
+      "hp": 15,
+      "speed": 2,
+      "damage": 3,
+      "reward": 22,
+      "color": "#FF5722",
+      "image": null,
+      "animDataUrl": null
+    },
+    {
+      "id": "boss_1",
+      "name": "魔王",
+      "type": "boss",
+      "hp": 60,
+      "speed": 1,
+      "damage": 4,
+      "reward": 80,
+      "color": "#9C27B0",
+      "image": null,
+      "animDataUrl": null
+    }
+  ],
+  "towers": [
+    {
+      "id": "archer",
+      "name": "弓箭手",
+      "rarity": "common",
+      "atk": 2,
+      "sfxType": "arrow",
+      "range": 3,
+      "cd": 1.2,
+      "color": "#78909C",
+      "image": null,
+      "animDataUrl": null,
+      "gridCols": 1,
+      "gridRows": 2,
+      "weight": 40,
+      "desc": "基础攻击塔，射程适中",
+      "levelStats": [
+        {
+          "atk": 2,
+          "range": 3,
+          "cd": 1.2
+        },
+        {
+          "atk": 3,
+          "range": 3.2,
+          "cd": 1.08
+        },
+        {
+          "atk": 4,
+          "range": 3.3,
+          "cd": 0.96
+        },
+        {
+          "atk": 6,
+          "range": 3.5,
+          "cd": 0.84
+        },
+        {
+          "atk": 8,
+          "range": 3.6,
+          "cd": 0.72
+        }
+      ]
+    },
+    {
+      "id": "cannon",
+      "name": "炮台",
+      "rarity": "common",
+      "atk": 5,
+      "sfxType": "cannonball",
+      "range": 2.5,
+      "cd": 2,
+      "color": "#607D8B",
+      "image": null,
+      "animDataUrl": null,
+      "weight": 35,
+      "desc": "范围伤害，攻速较慢",
+      "levelStats": [
+        {
+          "atk": 5,
+          "range": 2.5,
+          "cd": 2
+        },
+        {
+          "atk": 7,
+          "range": 2.6,
+          "cd": 1.8
+        },
+        {
+          "atk": 10,
+          "range": 2.8,
+          "cd": 1.6
+        },
+        {
+          "atk": 14,
+          "range": 2.9,
+          "cd": 1.4
+        },
+        {
+          "atk": 20,
+          "range": 3,
+          "cd": 1.2
+        }
+      ]
+    },
+    {
+      "id": "spear",
+      "name": "长枪兵",
+      "rarity": "common",
+      "atk": 3,
+      "sfxType": "bullet",
+      "range": 1.5,
+      "cd": 0.8,
+      "color": "#90A4AE",
+      "image": null,
+      "animDataUrl": null,
+      "weight": 30,
+      "desc": "近程高频攻击",
+      "levelStats": [
+        {
+          "atk": 3,
+          "range": 1.5,
+          "cd": 0.8
+        },
+        {
+          "atk": 4,
+          "range": 1.6,
+          "cd": 0.72
+        },
+        {
+          "atk": 6,
+          "range": 1.7,
+          "cd": 0.64
+        },
+        {
+          "atk": 8,
+          "range": 1.7,
+          "cd": 0.56
+        },
+        {
+          "atk": 12,
+          "range": 1.8,
+          "cd": 0.48
+        }
+      ]
+    },
+    {
+      "id": "mage",
+      "name": "法师",
+      "rarity": "rare",
+      "atk": 8,
+      "sfxType": "magic",
+      "range": 3.5,
+      "cd": 1.8,
+      "color": "#1565C0",
+      "image": null,
+      "animDataUrl": null,
+      "weight": 20,
+      "desc": "魔法攻击，对精英有效",
+      "levelStats": [
+        {
+          "atk": 8,
+          "range": 3.5,
+          "cd": 1.8
+        },
+        {
+          "atk": 11,
+          "range": 3.7,
+          "cd": 1.62
+        },
+        {
+          "atk": 16,
+          "range": 3.9,
+          "cd": 1.44
+        },
+        {
+          "atk": 22,
+          "range": 4,
+          "cd": 1.26
+        },
+        {
+          "atk": 32,
+          "range": 4.2,
+          "cd": 1.08
+        }
+      ]
+    },
+    {
+      "id": "ice_tower",
+      "name": "冰霜塔",
+      "rarity": "rare",
+      "atk": 4,
+      "sfxType": "ice",
+      "range": 3,
+      "cd": 1.5,
+      "color": "#0288D1",
+      "image": null,
+      "animDataUrl": null,
+      "weight": 18,
+      "desc": "攻击减速敌人25%",
+      "levelStats": [
+        {
+          "atk": 4,
+          "range": 3,
+          "cd": 1.5
+        },
+        {
+          "atk": 6,
+          "range": 3.2,
+          "cd": 1.35
+        },
+        {
+          "atk": 8,
+          "range": 3.3,
+          "cd": 1.2
+        },
+        {
+          "atk": 11,
+          "range": 3.5,
+          "cd": 1.05
+        },
+        {
+          "atk": 16,
+          "range": 3.6,
+          "cd": 0.9
+        }
+      ]
+    },
+    {
+      "id": "sniper",
+      "name": "狙击手",
+      "rarity": "rare",
+      "atk": 12,
+      "sfxType": "bullet",
+      "range": 6,
+      "cd": 3,
+      "color": "#01579B",
+      "image": null,
+      "animDataUrl": null,
+      "weight": 15,
+      "desc": "超远射程，单体高伤",
+      "levelStats": [
+        {
+          "atk": 12,
+          "range": 6,
+          "cd": 3
+        },
+        {
+          "atk": 17,
+          "range": 6.3,
+          "cd": 2.7
+        },
+        {
+          "atk": 24,
+          "range": 6.6,
+          "cd": 2.4
+        },
+        {
+          "atk": 34,
+          "range": 6.9,
+          "cd": 2.1
+        },
+        {
+          "atk": 48,
+          "range": 7.2,
+          "cd": 1.8
+        }
+      ]
+    },
+    {
+      "id": "thunder",
+      "name": "雷霆法师",
+      "rarity": "epic",
+      "atk": 20,
+      "sfxType": "magic",
+      "range": 4,
+      "cd": 2.5,
+      "color": "#6A1B9A",
+      "image": null,
+      "animDataUrl": null,
+      "weight": 8,
+      "desc": "闪电链攻击最多3目标",
+      "levelStats": [
+        {
+          "atk": 20,
+          "range": 4,
+          "cd": 2.5
+        },
+        {
+          "atk": 28,
+          "range": 4.2,
+          "cd": 2.25
+        },
+        {
+          "atk": 40,
+          "range": 4.4,
+          "cd": 2
+        },
+        {
+          "atk": 56,
+          "range": 4.6,
+          "cd": 1.75
+        },
+        {
+          "atk": 80,
+          "range": 4.8,
+          "cd": 1.5
+        }
+      ]
+    },
+    {
+      "id": "fortress",
+      "name": "要塞炮",
+      "rarity": "epic",
+      "atk": 30,
+      "sfxType": "cannonball",
+      "range": 3,
+      "cd": 4,
+      "color": "#4527A0",
+      "image": null,
+      "animDataUrl": null,
+      "weight": 6,
+      "desc": "大范围爆炸，伤害极高",
+      "levelStats": [
+        {
+          "atk": 30,
+          "range": 3,
+          "cd": 4
+        },
+        {
+          "atk": 42,
+          "range": 3.2,
+          "cd": 3.6
+        },
+        {
+          "atk": 60,
+          "range": 3.3,
+          "cd": 3.2
+        },
+        {
+          "atk": 84,
+          "range": 3.5,
+          "cd": 2.8
+        },
+        {
+          "atk": 120,
+          "range": 3.6,
+          "cd": 2.4
+        }
+      ]
+    },
+    {
+      "id": "dragon",
+      "name": "龙巢",
+      "rarity": "legendary",
+      "atk": 50,
+      "sfxType": "fire",
+      "range": 5,
+      "cd": 3.5,
+      "color": "#B71C1C",
+      "image": null,
+      "animDataUrl": null,
+      "gridCols": 2,
+      "gridRows": 2,
+      "weight": 2,
+      "desc": "喷火龙，持续燃烧伤害",
+      "levelStats": [
+        {
+          "atk": 50,
+          "range": 5,
+          "cd": 3.5
+        },
+        {
+          "atk": 70,
+          "range": 5.3,
+          "cd": 3.15
+        },
+        {
+          "atk": 100,
+          "range": 5.5,
+          "cd": 2.8
+        },
+        {
+          "atk": 140,
+          "range": 5.8,
+          "cd": 2.45
+        },
+        {
+          "atk": 200,
+          "range": 6,
+          "cd": 2.1
+        }
+      ]
+    }
+  ],
+  "levels": [
+    {
+      "id": 1,
+      "name": "新手村",
+      "unlocked": true,
+      "baseHp": 10,
+      "initGold": 100,
+      "waves": [
+        {
+          "delay": 2,
+          "monsters": [
+            {
+              "id": "normal_1",
+              "count": 5,
+              "interval": 1
+            }
+          ]
+        },
+        {
+          "delay": 2,
+          "monsters": [
+            {
+              "id": "normal_1",
+              "count": 6,
+              "interval": 1
+            }
+          ]
+        },
+        {
+          "delay": 2,
+          "monsters": [
+            {
+              "id": "normal_1",
+              "count": 7,
+              "interval": 1
+            }
+          ]
+        },
+        {
+          "delay": 2,
+          "monsters": [
+            {
+              "id": "normal_1",
+              "count": 8,
+              "interval": 1
+            }
+          ]
+        },
+        {
+          "delay": 3,
+          "monsters": [
+            {
+              "id": "elite_1",
+              "count": 3,
+              "interval": 1.5
+            }
+          ]
+        },
+        {
+          "delay": 2,
+          "monsters": [
+            {
+              "id": "normal_1",
+              "count": 9,
+              "interval": 1
+            }
+          ]
+        },
+        {
+          "delay": 2,
+          "monsters": [
+            {
+              "id": "normal_1",
+              "count": 10,
+              "interval": 1
+            }
+          ]
+        },
+        {
+          "delay": 2,
+          "monsters": [
+            {
+              "id": "normal_1",
+              "count": 11,
+              "interval": 1
+            }
+          ]
+        },
+        {
+          "delay": 2,
+          "monsters": [
+            {
+              "id": "normal_1",
+              "count": 12,
+              "interval": 1
+            }
+          ]
+        },
+        {
+          "delay": 3,
+          "monsters": [
+            {
+              "id": "elite_1",
+              "count": 3,
+              "interval": 1.5
+            }
+          ]
+        },
+        {
+          "delay": 2,
+          "monsters": [
+            {
+              "id": "normal_1",
+              "count": 13,
+              "interval": 1
+            }
+          ]
+        },
+        {
+          "delay": 2,
+          "monsters": [
+            {
+              "id": "normal_1",
+              "count": 14,
+              "interval": 1
+            }
+          ]
+        },
+        {
+          "delay": 2,
+          "monsters": [
+            {
+              "id": "normal_1",
+              "count": 15,
+              "interval": 1
+            }
+          ]
+        },
+        {
+          "delay": 2,
+          "monsters": [
+            {
+              "id": "normal_1",
+              "count": 16,
+              "interval": 1
+            }
+          ]
+        },
+        {
+          "delay": 4,
+          "monsters": [
+            {
+              "id": "boss_1",
+              "count": 1,
+              "interval": 0
+            }
+          ]
+        }
+      ],
+      "grid": [
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          1,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          1
+        ]
+      ],
+      "path": [
+        {
+          "col": 0,
+          "row": 1
+        },
+        {
+          "col": 1,
+          "row": 1
+        },
+        {
+          "col": 2,
+          "row": 1
+        },
+        {
+          "col": 3,
+          "row": 1
+        },
+        {
+          "col": 3,
+          "row": 2
+        },
+        {
+          "col": 3,
+          "row": 3
+        },
+        {
+          "col": 4,
+          "row": 3
+        },
+        {
+          "col": 5,
+          "row": 3
+        },
+        {
+          "col": 6,
+          "row": 3
+        },
+        {
+          "col": 6,
+          "row": 4
+        },
+        {
+          "col": 6,
+          "row": 5
+        },
+        {
+          "col": 7,
+          "row": 5
+        },
+        {
+          "col": 8,
+          "row": 5
+        },
+        {
+          "col": 9,
+          "row": 5
+        },
+        {
+          "col": 9,
+          "row": 6
+        },
+        {
+          "col": 9,
+          "row": 7
+        },
+        {
+          "col": 10,
+          "row": 7
+        },
+        {
+          "col": 11,
+          "row": 7
+        },
+        {
+          "col": 12,
+          "row": 7
+        },
+        {
+          "col": 12,
+          "row": 8
+        },
+        {
+          "col": 12,
+          "row": 9
+        },
+        {
+          "col": 13,
+          "row": 9
+        },
+        {
+          "col": 14,
+          "row": 9
+        },
+        {
+          "col": 14,
+          "row": 10
+        },
+        {
+          "col": 14,
+          "row": 11
+        },
+        {
+          "col": 15,
+          "row": 11
+        }
+      ],
+      "spawn": {
+        "col": 0,
+        "row": 1
+      },
+      "goal": {
+        "col": 15,
+        "row": 11
+      },
+      "goalImage": null,
+      "bgImage": null,
+      "pathImage": null
+    },
+    {
+      "id": 2,
+      "name": "森林小道",
+      "unlocked": false,
+      "baseHp": 10,
+      "initGold": 80,
+      "waves": [
+        {
+          "delay": 2,
+          "monsters": [
+            {
+              "id": "normal_2",
+              "count": 5,
+              "interval": 1
+            }
+          ]
+        },
+        {
+          "delay": 2,
+          "monsters": [
+            {
+              "id": "normal_2",
+              "count": 6,
+              "interval": 1
+            }
+          ]
+        },
+        {
+          "delay": 2,
+          "monsters": [
+            {
+              "id": "normal_2",
+              "count": 7,
+              "interval": 1
+            }
+          ]
+        },
+        {
+          "delay": 2,
+          "monsters": [
+            {
+              "id": "normal_2",
+              "count": 8,
+              "interval": 1
+            }
+          ]
+        },
+        {
+          "delay": 3,
+          "monsters": [
+            {
+              "id": "elite_2",
+              "count": 3,
+              "interval": 1.5
+            }
+          ]
+        },
+        {
+          "delay": 2,
+          "monsters": [
+            {
+              "id": "normal_2",
+              "count": 9,
+              "interval": 1
+            }
+          ]
+        },
+        {
+          "delay": 2,
+          "monsters": [
+            {
+              "id": "normal_2",
+              "count": 10,
+              "interval": 1
+            }
+          ]
+        },
+        {
+          "delay": 2,
+          "monsters": [
+            {
+              "id": "normal_2",
+              "count": 11,
+              "interval": 1
+            }
+          ]
+        },
+        {
+          "delay": 2,
+          "monsters": [
+            {
+              "id": "normal_2",
+              "count": 12,
+              "interval": 1
+            }
+          ]
+        },
+        {
+          "delay": 3,
+          "monsters": [
+            {
+              "id": "elite_2",
+              "count": 3,
+              "interval": 1.5
+            }
+          ]
+        },
+        {
+          "delay": 2,
+          "monsters": [
+            {
+              "id": "normal_2",
+              "count": 13,
+              "interval": 1
+            }
+          ]
+        },
+        {
+          "delay": 2,
+          "monsters": [
+            {
+              "id": "normal_2",
+              "count": 14,
+              "interval": 1
+            }
+          ]
+        },
+        {
+          "delay": 2,
+          "monsters": [
+            {
+              "id": "normal_2",
+              "count": 15,
+              "interval": 1
+            }
+          ]
+        },
+        {
+          "delay": 2,
+          "monsters": [
+            {
+              "id": "normal_2",
+              "count": 16,
+              "interval": 1
+            }
+          ]
+        },
+        {
+          "delay": 4,
+          "monsters": [
+            {
+              "id": "boss_1",
+              "count": 1,
+              "interval": 0
+            }
+          ]
+        }
+      ],
+      "grid": [
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          1,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "path": [
+        {
+          "col": 0,
+          "row": 2
+        },
+        {
+          "col": 1,
+          "row": 2
+        },
+        {
+          "col": 1,
+          "row": 3
+        },
+        {
+          "col": 1,
+          "row": 4
+        },
+        {
+          "col": 2,
+          "row": 4
+        },
+        {
+          "col": 3,
+          "row": 4
+        },
+        {
+          "col": 4,
+          "row": 4
+        },
+        {
+          "col": 5,
+          "row": 4
+        },
+        {
+          "col": 5,
+          "row": 5
+        },
+        {
+          "col": 5,
+          "row": 6
+        },
+        {
+          "col": 6,
+          "row": 6
+        },
+        {
+          "col": 7,
+          "row": 6
+        },
+        {
+          "col": 8,
+          "row": 6
+        },
+        {
+          "col": 8,
+          "row": 7
+        },
+        {
+          "col": 8,
+          "row": 8
+        },
+        {
+          "col": 9,
+          "row": 8
+        },
+        {
+          "col": 10,
+          "row": 8
+        },
+        {
+          "col": 11,
+          "row": 8
+        },
+        {
+          "col": 12,
+          "row": 8
+        },
+        {
+          "col": 12,
+          "row": 7
+        },
+        {
+          "col": 12,
+          "row": 6
+        },
+        {
+          "col": 12,
+          "row": 5
+        },
+        {
+          "col": 12,
+          "row": 4
+        },
+        {
+          "col": 13,
+          "row": 4
+        },
+        {
+          "col": 14,
+          "row": 4
+        },
+        {
+          "col": 14,
+          "row": 3
+        },
+        {
+          "col": 14,
+          "row": 2
+        },
+        {
+          "col": 14,
+          "row": 1
+        },
+        {
+          "col": 15,
+          "row": 1
+        }
+      ],
+      "spawn": {
+        "col": 0,
+        "row": 2
+      },
+      "goal": {
+        "col": 15,
+        "row": 1
+      },
+      "goalImage": null,
+      "bgImage": null,
+      "pathImage": null
+    }
+  ],
+  "spells": [
+    {
+      "id": "heal",
+      "name": "治疗术",
+      "isSpell": true,
+      "rarity": "common",
+      "color": "#4CAF50",
+      "value": 3,
+      "desc": "终点血量+3",
+      "weight": 20
+    },
+    {
+      "id": "max_hp_up",
+      "name": "加固术",
+      "isSpell": true,
+      "rarity": "rare",
+      "color": "#2196F3",
+      "value": 5,
+      "desc": "最大血量+5",
+      "weight": 12
+    },
+    {
+      "id": "aoe_damage",
+      "name": "陨石术",
+      "isSpell": true,
+      "rarity": "epic",
+      "color": "#FF5722",
+      "value": 8,
+      "desc": "全图8伤害",
+      "weight": 6
+    }
+  ],
+  "gacha": {
+    "baseCost": 10,
+    "costIncrease": 5,
+    "maxCost": 100,
+    "pityCount": 10,
+    "pityMinRarity": "rare",
+    "pityResetOnRarePlus": true
+  },
+  "rarityWeights": {
+    "common": 100,
+    "rare": 30,
+    "epic": 6,
+    "legendary": 1
+  },
+  "homeBgUrl": "/assets/general/41d5bf4a85b146fa.png"
+}

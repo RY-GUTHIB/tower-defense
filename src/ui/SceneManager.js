@@ -5,7 +5,6 @@
 import { HomePage } from '../../pages/home/HomePage.js';
 import { LevelSelectPage } from '../../pages/levelSelect/LevelSelectPage.js';
 import { GamePage } from '../../pages/game/GamePage.js';
-import { AdminPage } from '../../pages/admin/AdminPage.js';
 import { SCENE } from './SceneTypes.js';
 
 export class SceneManager {
@@ -20,12 +19,8 @@ export class SceneManager {
     this.pages = {
       [SCENE.HOME]: new HomePage(ctx, screenW, screenH, () => this.goto(SCENE.LEVEL_SELECT)),
       [SCENE.LEVEL_SELECT]: new LevelSelectPage(ctx, screenW, screenH, (levelId) => this.goto(SCENE.GAME, levelId), () => this.goto(SCENE.HOME)),
-      [SCENE.GAME]: new GamePage(ctx, screenW, screenH, (scene) => this.goto(scene)),
-      [SCENE.ADMIN]: new AdminPage(ctx, screenW, screenH, () => this.goto(SCENE.HOME))
+      [SCENE.GAME]: new GamePage(ctx, screenW, screenH, (scene) => this.goto(scene))
     };
-
-    // 首页的admin按钮回调
-    this.pages[SCENE.HOME].onAdminClick = () => this.goto(SCENE.ADMIN);
   }
 
   goto(scene, data) {

@@ -44,67 +44,68 @@ const { W, H } = initCanvas();
 // 初始化 UI（DOM 事件：toast/modal/音量控件）
 bootstrapUI();
 
-// 初始化配置
-ConfigManager.init();
+// 初始化配置（异步：尝试拉取远程配置，5秒超时后降级）
+let sceneManager = null;
 
-// ---- 场景管理器 ----
-let sceneManager = new SceneManager(canvas, ctx, W, H);
+ConfigManager.init().then(() => {
+  // ---- 场景管理器 ----
+  sceneManager = new SceneManager(canvas, ctx, W, H);
 
-// ---- 触摸事件 ----
-canvas.addEventListener('touchstart', (e) => {
-  e.preventDefault();
-  sceneManager.onTouchStart(e);
-}, { passive: false });
+  // ---- 触摸事件 ----
+  canvas.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    sceneManager.onTouchStart(e);
+  }, { passive: false });
 
-canvas.addEventListener('touchmove', (e) => {
-  e.preventDefault();
-  sceneManager.onTouchMove(e);
-}, { passive: false });
+  canvas.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    sceneManager.onTouchMove(e);
+  }, { passive: false });
 
-canvas.addEventListener('touchend', (e) => {
-  e.preventDefault();
-  sceneManager.onTouchEnd(e);
-}, { passive: false });
+  canvas.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    sceneManager.onTouchEnd(e);
+  }, { passive: false });
 
-// ---- 鼠标事件（桌面调试） ----
-canvas.addEventListener('mousedown', (e) => {
-  const fakeE = { changedTouches: [{ clientX: e.clientX, clientY: e.clientY }] };
-  sceneManager.onTouchStart(fakeE);
-});
-canvas.addEventListener('mousemove', (e) => {
-  if (e.buttons !== 1) return;
-  const fakeE = { changedTouches: [{ clientX: e.clientX, clientY: e.clientY }] };
-  sceneManager.onTouchMove(fakeE);
-});
-canvas.addEventListener('mouseup', (e) => {
-  const fakeE = { changedTouches: [{ clientX: e.clientX, clientY: e.clientY }] };
-  sceneManager.onTouchEnd(fakeE);
-});
+  // ---- 鼠标事件（桌面调试） ----
+  canvas.addEventListener('mousedown', (e) => {
+    const fakeE = { changedTouches: [{ clientX: e.clientX, clientY: e.clientY }] };
+    sceneManager.onTouchStart(fakeE);
+  });
+  canvas.addEventListener('mousemove', (e) => {
+    if (e.buttons !== 1) return;
+    const fakeE = { changedTouches: [{ clientX: e.clientX, clientY: e.clientY }] };
+    sceneManager.onTouchMove(fakeE);
+  });
+  canvas.addEventListener('mouseup', (e) => {
+    const fakeE = { changedTouches: [{ clientX: e.clientX, clientY: e.clientY }] };
+    sceneManager.onTouchEnd(fakeE);
+  });
 
-// ---- 窗口尺寸调整 ----
-window.addEventListener('resize', () => {
-  const n = initCanvas();
-  if (sceneManager) {
-    sceneManager.screenW = n.W;
-    sceneManager.screenH = n.H;
-    if (sceneManager.currentPage) {
-      sceneManager.currentPage.w = n.W;
-      sceneManager.currentPage.h = n.H;
-      sceneManager.currentPage.render();
+  // ---- 窗口尺寸调整 ----
+  window.addEventListener('resize', () => {
+    const n = initCanvas();
+    if (sceneManager) {
+      sceneManager.screenW = n.W;
+      sceneManager.screenH = n.H;
+      if (sceneManager.currentPage) {
+        sceneManager.currentPage.w = n.W;
+        sceneManager.currentPage.h = n.H;
+        sceneManager.currentPage.render();
+      }
     }
-  }
+  });
+
+  // ---- 开始 ----
+  sceneManager.goto(SCENE.HOME);
+
+  // ---- 音量控件显隐 ----
+  const _origGoto = sceneManager.goto.bind(sceneManager);
+  sceneManager.goto = function(scene, data) {
+    _origGoto(scene, data);
+    setVolumeWidgetVisible(scene === SCENE.HOME);
+  };
 });
-
-// ---- 开始 ----
-sceneManager.goto(SCENE.HOME);
-
-// ---- 音量控件显隐 ----
-// 保存原始 goto 引用
-const _origGoto = sceneManager.goto.bind(sceneManager);
-sceneManager.goto = function(scene, data) {
-  _origGoto(scene, data);
-  setVolumeWidgetVisible(scene === SCENE.HOME);
-};
 
 // ---- 音频自动恢复（浏览器策略） ----
 let _audioResumed = false;
@@ -117,8 +118,8 @@ const resumeAudio = () => {
 document.addEventListener('click', resumeAudio, { once: true });
 document.addEventListener('touchstart', resumeAudio, { once: true });
 
-// ---- 键盘快捷键 ----
 document.addEventListener('keydown', (e) => {
+  if (!sceneManager) return;
   if (e.key === 'r' || e.key === 'R') {
     sceneManager.goto(SCENE.HOME);
   }

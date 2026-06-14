@@ -1,8 +1,9 @@
 /**
  * HomePage.js - 首页
- * 画布绘制：游戏标题 + "开始游戏" + "后台配置"（需开发者授权）
+ * 画布绘制：游戏标题 + "开始游戏"
  */
 import { StorageUtil } from '../../src/utils/StorageUtil.js';
+import { ConfigManager } from '../../src/data/ConfigManager.js';
 import { Color, Font, font } from '../../src/ui/theme.js';
 import { drawButton } from '../../src/utils/DrawUtil.js';
 
@@ -15,7 +16,6 @@ export class HomePage {
 
     // 按钮区域
     this.startBtn = { x: w / 2 - 80, y: h * 0.45, w: 160, h: 50 };
-    this.adminBtn = { x: w / 2 - 80, y: h * 0.55, w: 160, h: 50 };
 
     // 开发者标记
     this.isDeveloper = this._checkDeveloper();
@@ -29,24 +29,28 @@ export class HomePage {
   }
 
   _loadBgImage() {
-    const bgDataUrl = StorageUtil.get('__home_bg_dataUrl');
-    if (!bgDataUrl) { this._bgImage = null; return; }
+    // 优先从 ConfigManager 读取（已同步到 config.json，所有浏览器共享）
+    const cfgUrl = ConfigManager.homeBgUrl;
+    const bgUrl = (cfgUrl && typeof cfgUrl === 'string' && cfgUrl.trim())
+      ? cfgUrl
+      : StorageUtil.get('__home_bg_dataUrl'); // fallback：兼容旧数据
+    if (!bgUrl) { this._bgImage = null; return; }
 
     // 已经加载过且URL未变则跳过
-    if (this._bgImage && this._bgImage._src === bgDataUrl) return;
+    if (this._bgImage && this._bgImage._src === bgUrl) return;
 
     // 抖音小游戏环境
     if (typeof tt !== 'undefined' && tt.createImage) {
       const img = tt.createImage();
-      img.onload = () => { this._bgImage = img; this._bgImage._src = bgDataUrl; this.render(); };
-      img.onerror = () => { console.warn('[HomePage] 背景图加载失败:', bgDataUrl); };
-      img.src = bgDataUrl;
+      img.onload = () => { this._bgImage = img; this._bgImage._src = bgUrl; this.render(); };
+      img.onerror = () => { console.warn('[HomePage] 背景图加载失败:', bgUrl); };
+      img.src = bgUrl;
     } else {
       // 浏览器环境
       const img = new Image();
-      img.onload = () => { this._bgImage = img; this._bgImage._src = bgDataUrl; this.render(); };
-      img.onerror = () => { console.warn('[HomePage] 背景图加载失败:', bgDataUrl); };
-      img.src = bgDataUrl;
+      img.onload = () => { this._bgImage = img; this._bgImage._src = bgUrl; this.render(); };
+      img.onerror = () => { console.warn('[HomePage] 背景图加载失败:', bgUrl); };
+      img.src = bgUrl;
     }
   }
 
@@ -84,10 +88,6 @@ export class HomePage {
     drawButton(ctx, this.startBtn.x, this.startBtn.y, this.startBtn.w, this.startBtn.h,
       '开始游戏', { color: Color.accent, textColor: Color.gold, fontSize: 18, fontWeight: '700' });
 
-    // 后台配置始终可见（AdminPage 自带密码验证）
-    drawButton(ctx, this.adminBtn.x, this.adminBtn.y, this.adminBtn.w, this.adminBtn.h,
-      '后台配置', { color: Color.warning, fontSize: 18, fontWeight: '700' });
-
     // 版本号
     ctx.fillStyle = 'rgba(255,255,255,0.3)';
     ctx.font = Font.caption;
@@ -105,11 +105,6 @@ export class HomePage {
 
     if (this._hit(this.startBtn, x, y)) {
       this.onStartGame();
-      return;
-    }
-
-    if (this._hit(this.adminBtn, x, y)) {
-      this.onAdminClick && this.onAdminClick();
     }
   }
 

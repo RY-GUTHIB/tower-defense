@@ -12,21 +12,24 @@ import { RARITY_WEIGHTS, MAX_HAND_SIZE } from '../data/gacha.js';
 // spells 通过 ConfigManager.getSpells() 获取，支持后台动态配置
 
 export class GachaSystem {
+  /**
+   * 注意：drawCount / pityCounter 的唯一数据源是 GameState，
+   * GachaSystem 不再自己维护，避免双重状态不一致。
+   */
   constructor() {
-    this.drawCount = 0;
-    this.pityCounter = 0;
+    // 状态由 GameState 统一管理
   }
 
   reset() {
-    this.drawCount = 0;
-    this.pityCounter = 0;
+    // 重置由 GameState 负责
   }
 
   /**
    * 计算本次抽卡费用
+   * @param {GameState} gameState
    */
-  getCurrentCost() {
-    return ConfigManager.calcGachaCost(this.drawCount);
+  getCurrentCost(gameState) {
+    return ConfigManager.calcGachaCost(gameState.drawCount);
   }
 
   /**
@@ -35,7 +38,7 @@ export class GachaSystem {
    * @returns {{success:boolean, card:object|null, reason:string}}
    */
   draw(gameState) {
-    const cost = this.getCurrentCost();
+    const cost = this.getCurrentCost(gameState);
 
     // 检查金币
     if (!gameState.spendGold(cost)) {
@@ -50,14 +53,13 @@ export class GachaSystem {
     }
 
     // 执行抽卡（混合防御塔和功能牌）
-    const card = this._rollCard();
+    const card = this._rollCard(gameState);
     if (!card.isSpell) {
       card.level = 1; // 防御塔默认1级
     }
 
-    // 更新计数
-    this.drawCount++;
-    gameState.drawCount = this.drawCount;
+    // 更新计数（唯一数据源：gameState）
+    gameState.drawCount++;
 
     // 保底逻辑
     const rarityOrder = ['common', 'rare', 'epic', 'legendary'];
@@ -65,14 +67,13 @@ export class GachaSystem {
 
     if (rarityIdx >= 1) {
       // 出了稀有+，保底计数器重置
-      this.pityCounter = 0;
+      gameState.pityCounter = 0;
     } else {
-      this.pityCounter++;
+      gameState.pityCounter++;
     }
 
     // 加入手牌
     gameState.addToHand(card);
-    gameState.pityCounter = this.pityCounter;
 
     return { success: true, card, reason: '' };
   }
@@ -83,7 +84,7 @@ export class GachaSystem {
    * @returns {{success:boolean, cards:Array, reason:string}}
    */
   draw4(gameState) {
-    const cost = this.getCurrentCost();
+    const cost = this.getCurrentCost(gameState);
 
     // 检查金币
     if (!gameState.spendGold(cost)) {
@@ -97,28 +98,25 @@ export class GachaSystem {
     // 连续抽4张
     const drawn = [];
     for (let i = 0; i < MAX_HAND_SIZE; i++) {
-      const card = this._rollCard();
+      const card = this._rollCard(gameState);
       if (!card.isSpell) {
         card.level = 1; // 防御塔默认1级
       }
-      this.drawCount++;
-      gameState.drawCount = this.drawCount;
+      gameState.drawCount++;
 
       // 保底逻辑
       const rarityOrder = ['common', 'rare', 'epic', 'legendary'];
       const rarityIdx = rarityOrder.indexOf(card.rarity);
       if (rarityIdx >= 1) {
-        this.pityCounter = 0;
+        gameState.pityCounter = 0;
       } else {
-        this.pityCounter++;
+        gameState.pityCounter++;
       }
 
       gameState.hand.push(card);
       gameState.handDisabled.push(false);
       drawn.push(card);
     }
-
-    gameState.pityCounter = this.pityCounter;
 
     return { success: true, cards: drawn, reason: '' };
   }
@@ -127,7 +125,7 @@ export class GachaSystem {
    * 核心抽卡随机算法（混合防御塔和功能牌）
    * 优先检查保底 → 否则按权重随机
    */
-  _rollCard() {
+  _rollCard(gameState) {
     const cfg = ConfigManager;
     const towers = cfg.getTowers();
     const weights = { ...cfg.getRarityWeights() };
@@ -137,7 +135,7 @@ export class GachaSystem {
     const allCards = [...towers, ...cfg.getSpells()];
 
     // 保底：强制稀有+
-    if (this.pityCounter >= (gachaCfg.pityCount || 10) - 1) {
+    if (gameState.pityCounter >= (gachaCfg.pityCount || 10) - 1) {
       return this._rollByRarity(weights, allCards, 'rare');
     }
 
